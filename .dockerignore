@@ -1,0 +1,9 @@
+.git/
+docker/
+storage/logs/
+.env
+node_modules/
+tests/
+.editorconfig
+.idea/
+*.md

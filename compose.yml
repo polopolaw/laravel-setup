@@ -1,0 +1,78 @@
+services:
+  app:
+    user: "${UID:-5000}:${GID:-5000}"
+    build:
+      dockerfile: Dockerfile
+      target: ${APP_ENV:-local}
+      args:
+        - UID=${UID:-5000}
+        - GID=${GID:-5000}
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-site.test}
+    volumes:
+      - ${APP_VOLUMES:-.:/var/www/html}
+      - ./docker/php/conf.d/${APP_ENV:-local}:/usr/local/etc/php/conf.d:ro
+      - ./storage:/var/www/html/storage
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "9000:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-app}
+      POSTGRES_USER: ${DB_USERNAME:-app}
+      POSTGRES_PASSWORD: /run/secrets/db_root_password
+    secrets:
+      - db_root_password
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-app}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+secrets:
+  db_root_password:
+    file: db_password.txt
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  backend:
+    driver: bridge
