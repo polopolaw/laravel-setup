@@ -66,9 +66,6 @@ FROM base AS production
 
 WORKDIR /var/www/html
 
-RUN rm -rf /tmp/* /var/tmp/* && \
-    rm -rf /var/www/html/storage/framework/cache/*
-
 RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.validate_timestamps=0" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.enable_cli=1" >> /usr/local/etc/php/conf.d/opcache.ini \
@@ -91,10 +88,9 @@ RUN composer install \
 RUN composer run-script post-install-cmd
 
 RUN php artisan migrate --force
-RUN php artisan optimize:clear && \
-    php artisan view:cache && \
-    php artisan event:cache
+RUN php artisan optimize:clear \
+    php artisan optimize
 
 USER appuser
 
-CMD ["sh", "-c", "php artisan optimize && php-fpm"]
+CMD ["sh", "-c", "php-fpm"]
