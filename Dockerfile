@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libpng-dev \
     zlib1g-dev \
+    psql \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -49,9 +50,6 @@ FROM base AS local
 WORKDIR /var/www/html
 
 RUN apt-get install -y\
-    git \
-    unzip \
-    $PHPIZE_DEPS \
     && pecl install xdebug-3.4.3 \
     && docker-php-ext-enable xdebug
 
