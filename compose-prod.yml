@@ -10,7 +10,6 @@ services:
     environment:
       - SERVER_NAME=${SERVER_NAME:-site.test}
     volumes:
-      - .:/var/www/html
       - ./docker/php/conf.d/${APP_ENV:-local}:/usr/local/etc/php/conf.d:ro
     depends_on:
       - redis
@@ -25,13 +24,14 @@ services:
     volumes:
       - .:/var/www/html
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
       - app
     networks:
       - backend
 
   postgres:
-    image: postgres:17-alpine
+    image: postgres:alpine
     environment:
       POSTGRES_DB: ${DB_DATABASE:-app}
       POSTGRES_USER: ${DB_USERNAME:-app}

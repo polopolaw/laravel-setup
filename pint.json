@@ -1,0 +1,53 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "@PHP80Migration": true,
+        "@PHP81Migration": true,
+        "declare_strict_types": true,
+        "strict_comparison": true,
+        "strict_param": true,
+        "void_return": true,
+        "final_class": true,
+        "mb_str_functions": true,
+        "fully_qualified_strict_types": true,
+        "combine_consecutive_unsets": true,
+        "ordered_class_elements": {
+            "order": [
+                "use_trait",
+                "case",
+                "constant",
+                "constant_public",
+                "constant_protected",
+                "constant_private",
+                "property_public",
+                "property_protected",
+                "property_private",
+                "construct",
+                "destruct",
+                "magic",
+                "phpunit",
+                "method_abstract",
+                "method_public_static",
+                "method_public",
+                "method_protected_static",
+                "method_protected",
+                "method_private_static",
+                "method_private"
+            ],
+            "sort_algorithm": "none"
+        },
+        "ordered_imports": {
+            "sort_algorithm": "alpha"
+        },
+        "no_superfluous_elseif": true,
+        "no_useless_else": true,
+        "modernize_types_casting": true,
+        "use_arrow_functions": true
+    },
+    "exclude": [
+        "database/",
+        "resources/",
+        "storage/",
+        "vendor/"
+    ]
+}

@@ -1,23 +1,14 @@
 FROM composer:2 AS composer
 
-WORKDIR /app
+FROM php:8.4-fpm AS base
 
-COPY composer.json composer.lock ./
-RUN composer install \
-    --ignore-platform-reqs \
-    --no-interaction \
-    --no-plugins \
-    --no-scripts \
-    --prefer-dist \
-    --optimize-autoloader
-
-FROM php:8.4-fpm-alpine AS base
+ENV TZ=Europe/Moscow
 
 ARG UID=5000
 ARG GID=5000
 
-RUN addgroup -g $GID appuser && \
-    adduser -u $UID -G appuser -D -H -s /bin/false appuser
+RUN groupadd -g $GID appuser && \
+    useradd -u $UID -g appuser -d /home/appuser -s /usr/sbin/nologin appuser
 
 WORKDIR /var/www/html
 
@@ -25,26 +16,39 @@ RUN mkdir -p storage/framework/{sessions,views,cache} && \
     chown -R appuser:appuser storage && \
     chmod -R 775 storage
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    curl \
+    libpq-dev \
+    libicu-dev \
     libzip-dev \
+    libonig-dev \
+    libfreetype6-dev \
+    libjpeg-dev \
     libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    linux-headers
-
+    zlib1g-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install \
-    zip \
+    && docker-php-ext-install -j$(nproc) \
     gd \
-    pdo_mysql
+    pdo \
+    pdo_pgsql \
+    mbstring \
+    intl \
+    zip \
+    exif \
+    sockets \
+    opcache \
+    pcntl
 
 
 FROM base AS local
 
 WORKDIR /var/www/html
 
-RUN apk add --no-cache \
+RUN apt-get install -y\
     git \
     unzip \
     $PHPIZE_DEPS \
@@ -52,10 +56,11 @@ RUN apk add --no-cache \
     && docker-php-ext-enable xdebug
 
 ENV PHP_IDE_CONFIG 'serverName=${SERVER_NAME}'
-COPY --from=composer /app/vendor ./vendor
 COPY --chown=appuser:appuser . .
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 USER appuser
+
 
 FROM base AS production
 
@@ -73,18 +78,23 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 
 COPY --from=composer /app/vendor ./vendor
 COPY --chown=appuser:appuser . .
+COPY --from=composer /usr/bin/composer /usr/bin/composer
 
+RUN composer install \
+    --ignore-platform-reqs \
+    --no-interaction \
+    --no-scripts \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-dev
+
+RUN composer run-script post-install-cmd
+
+RUN php artisan migrate --force
 RUN php artisan optimize:clear && \
-    php artisan optimize && \
     php artisan view:cache && \
     php artisan event:cache
 
 USER appuser
-
-# Удаляем development-зависимости в production
-RUN if [ "$APP_ENV" = "production" ]; then \
-      apk del $PHPIZE_DEPS git unzip; \
-      rm -rf /var/cache/apk/* /tmp/* /var/tmp/*; \
-    fi
 
 CMD ["sh", "-c", "php artisan optimize && php-fpm"]
