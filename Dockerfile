@@ -28,7 +28,6 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libpng-dev \
     zlib1g-dev \
-    psql \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -44,6 +43,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     opcache \
     pcntl
 
+RUN docker-php-ext-enable pdo_pgsql
 
 FROM base AS local
 
