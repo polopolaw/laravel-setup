@@ -7,8 +7,6 @@ services:
       args:
         - UID=${UID:-5000}
         - GID=${GID:-5000}
-    environment:
-      - SERVER_NAME=${SERVER_NAME:-site.test}
     depends_on:
       - redis
       - postgres

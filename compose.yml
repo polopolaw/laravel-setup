@@ -36,8 +36,6 @@ services:
       POSTGRES_DB: ${DB_DATABASE:-app}
       POSTGRES_USER: ${DB_USERNAME:-app}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-testpassword}
-    secrets:
-      - db_root_password
     restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -61,11 +59,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-
-secrets:
-  db_root_password:
-    file: db_password.txt
 
 volumes:
   redis_data:
