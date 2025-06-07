@@ -9,8 +9,6 @@ services:
         - GID=${GID:-5000}
     environment:
       - SERVER_NAME=${SERVER_NAME:-site.test}
-    volumes:
-      - ./docker/php/conf.d/${APP_ENV:-local}:/usr/local/etc/php/conf.d:ro
     depends_on:
       - redis
       - postgres

@@ -8,10 +8,10 @@ services:
         - UID=${UID:-5000}
         - GID=${GID:-5000}
     environment:
-      - SERVER_NAME=${SERVER_NAME:-site.test}
+      - PHP_IDE_CONFIG=serverName=${SERVER_NAME:-site.test}
     volumes:
       - .:/var/www/html
-      - ./docker/php/conf.d/${APP_ENV:-local}:/usr/local/etc/php/conf.d:ro
+      - ./docker/php/conf.d/local/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug-plus.ini
     depends_on:
       - redis
       - postgres
@@ -35,7 +35,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_DATABASE:-app}
       POSTGRES_USER: ${DB_USERNAME:-app}
-      POSTGRES_PASSWORD: /run/secrets/db_root_password
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-testpassword}
     secrets:
       - db_root_password
     restart: unless-stopped
