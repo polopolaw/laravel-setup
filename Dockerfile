@@ -17,6 +17,11 @@ RUN mkdir -p storage/framework/{sessions,views,cache} && \
     chmod -R 775 storage
 
 RUN apt-get update && apt-get install -y \
+    gnupg \
+    wget \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update && apt-get install -y \
     git \
     unzip \
     curl \
@@ -28,7 +33,7 @@ RUN apt-get update && apt-get install -y \
     libjpeg-dev \
     libpng-dev \
     zlib1g-dev \
-    postgresql-client \
+    postgresql-client-17 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -85,8 +90,7 @@ RUN composer install \
 
 RUN composer run-script post-install-cmd
 
-RUN php artisan migrate --force
-RUN php artisan optimize:clear \
+RUN php artisan optimize:clear && \
     php artisan optimize
 
 USER appuser

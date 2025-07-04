@@ -7,6 +7,8 @@ services:
       args:
         - UID=${UID:-5000}
         - GID=${GID:-5000}
+    volumes:
+      - ./docker/php/conf.d/production/opcache.ini:/usr/local/etc/php/conf.d/docker-php-opcache-plus.ini:ro
     depends_on:
       - redis
       - postgres
