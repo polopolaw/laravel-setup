@@ -19,8 +19,9 @@ RUN mkdir -p storage/framework/{sessions,views,cache} && \
 RUN apt-get update && apt-get install -y \
     gnupg \
     wget \
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    lsb-release \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
     && apt-get update && apt-get install -y \
     git \
     unzip \
@@ -47,7 +48,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     exif \
     sockets \
     opcache \
-    pcntl
+    pcntl \
+    php-redis
 
 RUN docker-php-ext-enable pdo_pgsql
 
@@ -63,7 +65,7 @@ COPY --chown=appuser:appuser . .
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN touch /var/log/xdebug.log && chown appuser:appuser /var/log/xdebug.log && chmod 664 /var/log/xdebug.log
 USER appuser
-
+ENTRYPOINT ["sh", "/var/www/html/docker/php/docker-entrypoint.sh"]
 
 FROM base AS production
 
