@@ -39,19 +39,14 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
-    gd \
-    pdo \
     pdo_pgsql \
-    mbstring \
     intl \
     zip \
-    exif \
-    sockets \
-    opcache \
-    pcntl \
-    php-redis
+    gd \
+    exif
 
-RUN docker-php-ext-enable pdo_pgsql
+RUN pecl install redis && docker-php-ext-enable redis
+RUN docker-php-ext-enable opcache
 
 FROM base AS local
 
