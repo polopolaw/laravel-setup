@@ -38,8 +38,6 @@ services:
       POSTGRES_USER: ${DB_USERNAME:-app}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-testpassword}
     restart: unless-stopped
-    ports:
-      - "5642:5432"
     volumes:
       - postgres_test_data:/var/lib/postgresql/data
     networks:
@@ -84,7 +82,7 @@ services:
     volumes:
       - ./:/var/www
     depends_on:
-      - db
+      - postgres
       - redis
     networks:
       - backend
@@ -99,7 +97,7 @@ services:
     volumes:
       - ./:/var/www
     depends_on:
-      - db
+      - postgres
     networks:
       - backend
     command: php artisan schedule:work

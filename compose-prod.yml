@@ -60,7 +60,20 @@ services:
       timeout: 5s
       retries: 5
 
-
+  queue-worker:
+    build:
+      context: ./docker/app
+    image: app
+    restart: unless-stopped
+    user: "${UID:-5000}:${GID:-5000}"
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend
+    command: php artisan horizon
 secrets:
   db_root_password:
     file: db_password.txt
