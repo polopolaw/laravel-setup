@@ -1,6 +1,7 @@
 services:
   app:
     user: "${UID:-5000}:${GID:-5000}"
+    image: backend-image
     build:
       dockerfile: Dockerfile
       target: ${APP_ENV:-local}
@@ -74,13 +75,10 @@ services:
       retries: 5
 
   queue-worker:
-    build:
-      context: ./docker/app
-    image: app
+    image: backend-image
     restart: unless-stopped
-    user: "${UID:-5000}:${GID:-5000}"
     volumes:
-      - ./:/var/www
+      - .:/var/www/html
     depends_on:
       - postgres
       - redis
@@ -89,18 +87,16 @@ services:
     command: php artisan horizon
 
   schedule-worker:
-    build:
-      context: ./docker/app
-    image: app
+    image: backend-image
     restart: unless-stopped
-    user: "${UID:-5000}:${GID:-5000}"
     volumes:
-      - ./:/var/www
+      - .:/var/www/html
     depends_on:
       - postgres
     networks:
       - backend
     command: php artisan schedule:work
+
 volumes:
   redis_data:
   postgres_data:

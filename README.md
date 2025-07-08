@@ -30,4 +30,4 @@ Laravel Setup By [Andrey Gurkovskiy](https://t.me/easyitomsk)
 ### Production
 ...
 
-(coming soon)
+1. Setup LOG_CHANNEL=syslog 

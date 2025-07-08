@@ -61,19 +61,27 @@ services:
       retries: 5
 
   queue-worker:
-    build:
-      context: ./docker/app
-    image: app
+    image: backend-image
     restart: unless-stopped
-    user: "${UID:-5000}:${GID:-5000}"
-    volumes:
-      - ./:/var/www
+
+    environment:
+      LOG_CHANNEL: syslog
     depends_on:
       - postgres
       - redis
     networks:
       - backend
     command: php artisan horizon
+
+  schedule-worker:
+    image: backend-image
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - backend
+    command: php artisan schedule:work
+
 secrets:
   db_root_password:
     file: db_password.txt
