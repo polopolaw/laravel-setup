@@ -30,4 +30,4 @@ Laravel Setup By [Andrey Gurkovskiy](https://t.me/easyitomsk)
 ### Production
 ...
 
-(comming soon)
+(coming soon)
