@@ -5,6 +5,11 @@
 4. Setup APP_ENV=production for better error handling experience (on local env error stacktrace may be bloated)
 5. Go to http://127.0.0.1:9000
 
+### Working with AI
+install cline
+write you brief in memory-bank/projectbrief.md
+write initialize memory bank
+
 #### Optional
 Setup project icon in PhpStorm
 ```
@@ -28,6 +33,11 @@ composer lint
 Laravel Setup By [Andrey Gurkovskiy](https://t.me/easyitomsk)
 
 ### Production
-...
+
+setup .env vars
+
+```
+docker compose -f compose-prod.yml up -d
+```
 
 1. Setup LOG_CHANNEL=syslog 

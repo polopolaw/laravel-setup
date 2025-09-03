@@ -74,7 +74,6 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.interned_strings_buffer=16" >> /usr/local/etc/php/conf.d/opcache.ini \
     && echo "opcache.max_accelerated_files=20000" >> /usr/local/etc/php/conf.d/opcache.ini
 
-COPY --from=composer /app/vendor ./vendor
 COPY --chown=appuser:appuser . .
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
@@ -85,8 +84,6 @@ RUN composer install \
     --prefer-dist \
     --optimize-autoloader \
     --no-dev
-
-RUN composer run-script post-install-cmd
 
 RUN php artisan optimize:clear && \
     php artisan optimize
