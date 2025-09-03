@@ -1,0 +1,11 @@
+vendor/
+.git/
+node-modules/
+
+.env
+.env.testing
+
+
+# Large data files
+*.xlsx
+database/database.sqlite
