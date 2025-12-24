@@ -1,6 +1,6 @@
 FROM composer:2 AS composer
 
-FROM php:8.4-fpm AS base
+FROM php:8.5-fpm AS base
 
 ENV TZ=Europe/Moscow
 
@@ -47,14 +47,13 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     pcntl
 
 RUN pecl install redis && docker-php-ext-enable redis
-RUN docker-php-ext-enable opcache
 
 FROM base AS local
 
 WORKDIR /var/www/html
 
 RUN apt-get install -y \
-    && pecl install xdebug-3.4.3 \
+    && pecl install xdebug-3.5.0 \
     && docker-php-ext-enable xdebug
 
 COPY --chown=appuser:appuser . .
